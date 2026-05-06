@@ -1,49 +1,75 @@
 # ─────────────────────────────────────────────────────────────────
 # GitLab Agentic RAG Chatbot — Dependencies
-# 💰 ZERO COST setup: OpenRouter (free models) + local embeddings
+# 💰 ZERO COST: OpenRouter (free models) + local embeddings
+#
+# Install: pip install -r requirements.txt
+#
+# Phase 1 (Ingestion):  Scrape → Chunk → Embed → Store in ChromaDB
+# Phase 2 (Agents):     CrewAI agents → Retrieve → Validate → Answer
 # ─────────────────────────────────────────────────────────────────
 
-# ── LLM via OpenRouter ────────────────────────────────────────────
-# OpenRouter is OpenAI API-compatible — same SDK, different base_url
-openai>=1.30.0               # Used as the HTTP client for OpenRouter
 
-# ── CrewAI (multi-agent orchestration) ───────────────────────────
-crewai>=0.55.0
-crewai-tools>=0.8.0
+# ══════════════════════════════════════════════════════════════════
+# PHASE 1 DEPENDENCIES
+# ══════════════════════════════════════════════════════════════════
 
-# ── Local Embeddings (FREE — runs on your CPU, no API needed) ─────
-# Downloads model once (~90MB), then works fully offline
+# ── LLM Client (OpenRouter uses OpenAI-compatible API) ────────────
+openai>=1.30.0
+
+# ── Local Embeddings (100% FREE — runs on CPU, no API needed) ─────
+# Model downloads once (~90MB), works fully offline after that
 sentence-transformers>=3.0.0
-# PyTorch CPU-only (much smaller download than full CUDA version)
 torch>=2.2.0
-# Tokenizers (dependency of sentence-transformers)
 transformers>=4.40.0
 huggingface-hub>=0.23.0
+numpy>=1.24.0               # Used directly in embedder.py (np.ndarray)
 
-# ── Vector Database (local, free) ────────────────────────────────
+# ── Vector Database ───────────────────────────────────────────────
 chromadb>=0.5.0
 
 # ── Document Processing ───────────────────────────────────────────
 langchain>=0.2.0
 langchain-community>=0.2.0
-tiktoken>=0.7.0              # Token counting for chunk size checks
+tiktoken>=0.7.0             # Token counting for chunk size enforcement
 
-# ── Markdown + Web parsing ────────────────────────────────────────
+# ── Markdown + HTML Parsing ───────────────────────────────────────
 beautifulsoup4>=4.12.0
 markdownify>=0.12.0
-PyYAML>=6.0
+PyYAML>=6.0                 # Parse YAML frontmatter in GitLab .md files
 
-# ── HTTP / Scraping ───────────────────────────────────────────────
+# ── HTTP / Web Scraping ───────────────────────────────────────────
 requests>=2.32.0
 httpx>=0.27.0
 
-# ── Utilities ─────────────────────────────────────────────────────
-python-dotenv>=1.0.0
-rich>=13.7.0
-tqdm>=4.66.0
-pydantic>=2.7.0
-loguru>=0.7.0
-tenacity>=8.3.0
 
-# ── Dev / Testing ─────────────────────────────────────────────────
+# ══════════════════════════════════════════════════════════════════
+# PHASE 2 ADDITIONS — CrewAI Agent System
+# ══════════════════════════════════════════════════════════════════
+
+# ── CrewAI (multi-agent orchestration) ───────────────────────────
+crewai>=0.60.0              # Phase 2: Agent, Crew, Process, @tool decorator
+crewai-tools>=0.8.0         # Phase 2: Built-in tools (if needed later)
+
+# ── LangChain OpenAI (required for CrewAI's llm= parameter) ──────
+# CrewAI's Agent(llm=...) expects a LangChain LLM object — not raw openai client
+# ChatOpenAI works with OpenRouter via openai_api_base override
+langchain-openai>=0.1.0     # Phase 2: ChatOpenAI for CrewAI agent LLM
+
+
+# ══════════════════════════════════════════════════════════════════
+# SHARED UTILITIES (used across Phase 1 + Phase 2)
+# ══════════════════════════════════════════════════════════════════
+
+python-dotenv>=1.0.0        # Load .env variables
+rich>=13.7.0                # Terminal UI (panels, tables, progress bars)
+tqdm>=4.66.0                # Progress bars for long loops
+pydantic>=2.7.0             # Data validation (settings.py models)
+loguru>=0.7.0               # Structured logging
+tenacity>=8.3.0             # Retry logic for API calls and HTTP requests
+
+
+# ══════════════════════════════════════════════════════════════════
+# DEV / TESTING
+# ══════════════════════════════════════════════════════════════════
+
 pytest>=8.2.0

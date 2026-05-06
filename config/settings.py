@@ -33,7 +33,7 @@ class Settings(BaseModel):
     openrouter_model: str = Field(
         default_factory=lambda: os.getenv(
             "OPENROUTER_MODEL",
-            "nvidia/nemotron-3-super-120b-a12b:free"
+            "meta-llama/llama-3.1-8b-instruct:free"
         )
     )
     openrouter_base_url: str = "https://openrouter.ai/api/v1"
