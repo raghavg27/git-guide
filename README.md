@@ -5,6 +5,8 @@ by retrieving answers directly from the official GitLab documentation — ground
 cited, and hallucination-free. Built with CrewAI, ChromaDB, and local sentence
 embeddings. **Total running cost: $0.00.**
 
+![Screenshot](./images/screenshot.png)
+
 ---
 
 ## ✨ Live Demo
